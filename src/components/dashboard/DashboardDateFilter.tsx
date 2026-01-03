@@ -52,7 +52,7 @@ export function DashboardDateFilter() {
                             type="date"
                             value={startDate}
                             onChange={(e) => setStartDate(e.target.value)}
-                            className="h-9 px-3 rounded-xl bg-gray-50 border-0 focus:ring-2 focus:ring-emerald-500/20 text-[11px] font-bold text-emerald-950 transition-all outline-none"
+                            className="h-9 px-3 rounded-xl bg-gray-50/80 border border-gray-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)] focus:ring-2 focus:ring-emerald-500/20 focus:bg-white text-[11px] font-bold text-emerald-950 transition-all outline-none"
                         />
                     </div>
                     <span className="text-[10px] font-black text-gray-300">/</span>
@@ -61,7 +61,7 @@ export function DashboardDateFilter() {
                             type="date"
                             value={endDate}
                             onChange={(e) => setEndDate(e.target.value)}
-                            className="h-9 px-3 rounded-xl bg-gray-50 border-0 focus:ring-2 focus:ring-emerald-500/20 text-[11px] font-bold text-emerald-950 transition-all outline-none"
+                            className="h-9 px-3 rounded-xl bg-gray-50/80 border border-gray-100 shadow-[inset_0_2px_4px_rgba(0,0,0,0.06)] focus:ring-2 focus:ring-emerald-500/20 focus:bg-white text-[11px] font-bold text-emerald-950 transition-all outline-none"
                         />
                     </div>
                 </div>
