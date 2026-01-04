@@ -8,6 +8,7 @@ interface DashboardChartProps {
     data: {
         date: string
         total: number
+        rice?: number
     }[]
 }
 
@@ -35,6 +36,10 @@ export function DashboardChart({ data }: DashboardChartProps) {
                                     <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
                                     <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                                 </linearGradient>
+                                <linearGradient id="colorRice" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                </linearGradient>
                             </defs>
                             <XAxis
                                 dataKey="date"
@@ -43,9 +48,8 @@ export function DashboardChart({ data }: DashboardChartProps) {
                                 tick={{ fontSize: 10, fontWeight: 700, fill: '#94a3b8' }}
                                 dy={10}
                             />
-                            <YAxis
-                                hide
-                            />
+                            <YAxis yAxisId="money" hide />
+                            <YAxis yAxisId="rice" hide />
                             <Tooltip
                                 contentStyle={{
                                     borderRadius: '20px',
@@ -56,7 +60,7 @@ export function DashboardChart({ data }: DashboardChartProps) {
                                 itemStyle={{
                                     fontSize: '12px',
                                     fontWeight: '900',
-                                    color: '#064e3b'
+                                    paddingBottom: '2px'
                                 }}
                                 labelStyle={{
                                     fontSize: '10px',
@@ -65,18 +69,37 @@ export function DashboardChart({ data }: DashboardChartProps) {
                                     marginBottom: '4px',
                                     textTransform: 'uppercase'
                                 }}
-                                formatter={(value?: number) => [
-                                    new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(value ?? 0),
-                                    'Total'
-                                ]}
+                                formatter={(value: any, name: any) => {
+                                    const val = Number(value || 0)
+                                    if (String(name) === "total") {
+                                        return [
+                                            new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val),
+                                            'Total Uang'
+                                        ]
+                                    }
+                                    return [`${val} L`, 'Zakat Beras']
+                                }}
                             />
                             <Area
+                                yAxisId="money"
                                 type="monotone"
                                 dataKey="total"
+                                name="total"
                                 stroke="#10b981"
                                 strokeWidth={4}
                                 fillOpacity={1}
                                 fill="url(#colorTotal)"
+                                animationDuration={2000}
+                            />
+                            <Area
+                                yAxisId="rice"
+                                type="monotone"
+                                dataKey="rice"
+                                name="rice"
+                                stroke="#3b82f6"
+                                strokeWidth={4}
+                                fillOpacity={1}
+                                fill="url(#colorRice)"
                                 animationDuration={2000}
                             />
                         </AreaChart>

@@ -11,6 +11,7 @@ import { Printer, Save, Plus, Trash2, Calculator, Loader2, ArrowLeft, History as
 import { ReceiptData } from "./ReceiptModal"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import { AlertDialog } from "@/components/ui/AlertDialog"
 
 interface UnifiedTransactionFormProps {
     initialData?: {
@@ -36,6 +37,7 @@ export default function UnifiedTransactionForm({ initialData, originalId }: Unif
     const [isUpdate, setIsUpdate] = useState(false)
     const [loading, setLoading] = useState(false)
     const [receiptData, setReceiptData] = useState<ReceiptData | null>(null)
+    const [showAlert, setShowAlert] = useState(false)
 
     // State formulir: Mengatur input dari user
     const [type, setType] = useState<TransactionType>(initialData?.type || "FITRAH_UANG")
@@ -99,10 +101,17 @@ export default function UnifiedTransactionForm({ initialData, originalId }: Unif
             return
         }
 
+        // Validasi Pembayaran
+        if (totalBayar > 0 && kembalian < 0) {
+            setShowAlert(true)
+            setLoading(false)
+            return
+        }
+
         const data = {
             type,
             muzakkiNames: names,
-            amountPerPerson: amountPerPerson,
+            amountPerPerson: type === "FITRAH_BERAS" ? 0 : amountPerPerson,
             amountRicePerPerson: amountRicePerPerson,
             infaqAmount: infaqAmount,
             paymentAmount: paymentAmount,
@@ -566,6 +575,17 @@ export default function UnifiedTransactionForm({ initialData, originalId }: Unif
                     </button>
                 </div>
             </div>
+
+            <AlertDialog
+                isOpen={showAlert}
+                onClose={() => setShowAlert(false)}
+                onConfirm={() => setShowAlert(false)}
+                variant="warning"
+                title="Pembayaran Kurang"
+                description="Harap isi nominal uang yang diterima dengan benar sebelum melanjutkan."
+                confirmText="Ok, Saya Mengerti"
+                cancelText="Tutup"
+            />
         </form>
     )
 }

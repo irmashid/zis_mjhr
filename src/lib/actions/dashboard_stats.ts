@@ -44,6 +44,7 @@ export async function getDashboardStats(startDate?: string, endDate?: string) {
 
         // Siapkan data untuk grafik 7 hari terakhir
         const dailyDataMap: Record<string, number> = {}
+        const dailyRiceMap: Record<string, number> = {}
         const last7Days = Array.from({ length: 7 }, (_, i) => {
             const date = new Date()
             date.setDate(date.getDate() - i)
@@ -51,7 +52,10 @@ export async function getDashboardStats(startDate?: string, endDate?: string) {
         }).reverse()
 
         // Initialize map
-        last7Days.forEach(day => dailyDataMap[day] = 0)
+        last7Days.forEach(day => {
+            dailyDataMap[day] = 0
+            dailyRiceMap[day] = 0
+        })
 
         transactions.forEach(t => {
             if (t.amount) totalUang += t.amount
@@ -67,12 +71,14 @@ export async function getDashboardStats(startDate?: string, endDate?: string) {
             const day = (t as any).createdAt.toISOString().split('T')[0]
             if (day in dailyDataMap) {
                 dailyDataMap[day] += (t.amount || 0)
+                dailyRiceMap[day] += (t.amount_rice || 0)
             }
         })
 
         const chartData = last7Days.map(day => ({
             date: new Intl.DateTimeFormat('id-ID', { day: '2-digit', month: 'short' }).format(new Date(day)),
-            total: dailyDataMap[day]
+            total: dailyDataMap[day],
+            rice: dailyRiceMap[day]
         }))
 
         return {

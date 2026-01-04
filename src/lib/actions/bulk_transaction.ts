@@ -29,7 +29,7 @@ export async function createBulkTransaction(data: BulkTransactionData) {
                 await tx.transaction.create({
                     data: {
                         type: data.type,
-                        amount: data.amountPerPerson,
+                        amount: data.type === 'FITRAH_BERAS' ? 0 : data.amountPerPerson,
                         amount_rice: data.type === 'FITRAH_BERAS' ? data.amountRicePerPerson : null,
                         description: data.description,
                         receiptId: receiptId,
@@ -87,7 +87,7 @@ export async function updateBulkTransaction(receiptId: string | null | undefined
                 await tx.transaction.create({
                     data: {
                         type: data.type,
-                        amount: data.amountPerPerson,
+                        amount: data.type === 'FITRAH_BERAS' ? 0 : data.amountPerPerson,
                         amount_rice: data.type === 'FITRAH_BERAS' ? data.amountRicePerPerson : null,
                         description: data.description,
                         receiptId: finalReceiptId,
