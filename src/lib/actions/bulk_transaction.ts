@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache"
 import { TransactionType } from "@prisma/client"
 import { randomUUID } from "crypto"
 import { getSession } from "@/lib/auth/session"
+import { logActivity } from "./activity"
 
 export type BulkTransactionData = {
     type: TransactionType
@@ -31,11 +32,17 @@ export async function createBulkTransaction(data: BulkTransactionData) {
 
     try {
         await prisma.$transaction(async (tx) => {
-            for (const name of data.muzakkiNames) {
+            for (let i = 0; i < data.muzakkiNames.length; i++) {
+                const name = data.muzakkiNames[i];
+                // Untuk Zakat Mal, nominal hanya disimpan pada baris pertama agar tidak berlipat saat dijumlah (agregasi)
+                const amount = (data.type === 'MAL' && i > 0) || data.type === 'FITRAH_BERAS'
+                    ? 0
+                    : data.amountPerPerson;
+
                 await tx.transaction.create({
                     data: {
                         type: data.type,
-                        amount: data.type === 'FITRAH_BERAS' ? 0 : data.amountPerPerson,
+                        amount: amount,
                         amount_rice: data.type === 'FITRAH_BERAS' ? data.amountRicePerPerson : null,
                         description: data.description,
                         receiptId: receiptId,
@@ -69,6 +76,8 @@ export async function createBulkTransaction(data: BulkTransactionData) {
         revalidatePath("/transaksi")
         revalidatePath("/")
 
+        await logActivity("CREATE_BATCH", `${session.role === 'ADMINISTRATOR' ? 'Administrator' : 'Panitia ZIS'} dengan nama lengkap ${session.nama_lengkap} baru saja menginput data transaksi (Batch) dengan ID Struk ${receiptId.split('-')[0]}.`)
+
         return { success: true, receiptId }
     } catch (error) {
         console.error("Bulk transaction error:", error)
@@ -98,11 +107,17 @@ export async function updateBulkTransaction(receiptId: string | null | undefined
             }
 
             // 2. Tulis ulang data transaksi yang baru
-            for (const name of data.muzakkiNames) {
+            for (let i = 0; i < data.muzakkiNames.length; i++) {
+                const name = data.muzakkiNames[i];
+                // Untuk Zakat Mal, nominal hanya disimpan pada baris pertama agar tidak berlipat saat dijumlah (agregasi)
+                const amount = (data.type === 'MAL' && i > 0) || data.type === 'FITRAH_BERAS'
+                    ? 0
+                    : data.amountPerPerson;
+
                 await tx.transaction.create({
                     data: {
                         type: data.type,
-                        amount: data.type === 'FITRAH_BERAS' ? 0 : data.amountPerPerson,
+                        amount: amount,
                         amount_rice: data.type === 'FITRAH_BERAS' ? data.amountRicePerPerson : null,
                         description: data.description,
                         receiptId: finalReceiptId,
@@ -134,6 +149,9 @@ export async function updateBulkTransaction(receiptId: string | null | undefined
 
         revalidatePath("/transaksi")
         revalidatePath("/")
+
+        await logActivity("UPDATE_BATCH", `${session.role === 'ADMINISTRATOR' ? 'Administrator' : 'Panitia ZIS'} dengan nama lengkap ${session.nama_lengkap} baru saja mengedit data transaksi (Batch) dengan ID Struk ${finalReceiptId.split('-')[0]}.`)
+
         return { success: true, receiptId: finalReceiptId }
     } catch (error) {
         console.error("Update bulk transaction error:", error)

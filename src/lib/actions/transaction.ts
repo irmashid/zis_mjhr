@@ -1,5 +1,7 @@
 "use server"
 
+import { randomUUID } from "crypto"
+import { logActivity } from "./activity"
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache"
 import { TransactionType } from "@prisma/client"
@@ -24,7 +26,7 @@ export async function getTransactions(
     endDate?: string,
     query?: string,
     page: number = 1,
-    pageSize: number = 10
+    pageSize: number = 5
 ) {
     try {
         const where: Record<string, any> = {}
@@ -182,6 +184,13 @@ export async function getTransactionsByReceiptId(receiptId: string) {
     try {
         return await prisma.transaction.findMany({
             where: { receiptId },
+            include: {
+                createdBy: {
+                    select: {
+                        nama_lengkap: true
+                    }
+                }
+            }
         })
     } catch (error) {
         console.error("Gagal mengambil data transaksi berdasarkan receiptId:", error)
@@ -214,6 +223,9 @@ export async function updateTransaction(id: number, data: TransactionData) {
         })
         revalidatePath("/transaksi")
         revalidatePath("/")
+
+        await logActivity("UPDATE_TRANSACTION", `${session.role === 'ADMINISTRATOR' ? 'Administrator' : 'Panitia ZIS'} dengan nama lengkap ${session.nama_lengkap} baru saja mengedit data transaksi dengan ID transaksi TX-${id}.`)
+
         return { success: true }
     } catch (error) {
         console.error("Error saat memperbarui transaksi:", error)
@@ -233,6 +245,9 @@ export async function deleteTransaction(id: number) {
         })
         revalidatePath("/transaksi")
         revalidatePath("/")
+
+        await logActivity("DELETE_TRANSACTION", `${session.role === 'ADMINISTRATOR' ? 'Administrator' : 'Panitia ZIS'} dengan nama lengkap ${session.nama_lengkap} baru saja menghapus data transaksi dengan ID transaksi TX-${id}.`)
+
         return { success: true }
     } catch (error) {
         console.error(error)
@@ -252,6 +267,9 @@ export async function deleteTransactionsByReceiptId(receiptId: string) {
         })
         revalidatePath("/transaksi")
         revalidatePath("/")
+
+        await logActivity("DELETE_BATCH", `${session.role === 'ADMINISTRATOR' ? 'Administrator' : 'Panitia ZIS'} dengan nama lengkap ${session.nama_lengkap} baru saja menghapus grup transaksi dengan ID Struk ${receiptId.split('-')[0]}.`)
+
         return { success: true }
     } catch (error) {
         console.error("Gagal menghapus grup transaksi:", error)

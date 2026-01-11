@@ -65,7 +65,7 @@ export default function SuccessModal() {
 
         // Agregasi data untuk struk
         const first = transactions[0]
-        const names = transactions.map((t: any) => t.muzakkiName).filter(Boolean)
+        const names = transactions.filter((t: any) => t.type !== "INFAQ").map((t: any) => t.muzakkiName).filter(Boolean)
         const totalZakatUang = transactions.filter((t: any) => t.type !== "FITRAH_BERAS" && t.type !== "INFAQ").reduce((acc: number, curr: any) => acc + curr.amount, 0)
         const totalZakatBeras = transactions.filter((t: any) => t.type === "FITRAH_BERAS").reduce((acc: number, curr: any) => acc + (curr.amount_rice || 0), 0)
         const infaqAmount = transactions.filter((t: any) => t.type === "INFAQ").reduce((acc: number, curr: any) => acc + curr.amount, 0)
@@ -81,7 +81,8 @@ export default function SuccessModal() {
             infaqAmount,
             totalBayar,
             paymentAmount: first.paymentAmount || totalBayar,
-            kembalian: first.kembalian || 0
+            kembalian: first.kembalian || 0,
+            officerName: (first as any).createdBy?.nama_lengkap
         })
 
         setIsReceiptModalOpen(true)

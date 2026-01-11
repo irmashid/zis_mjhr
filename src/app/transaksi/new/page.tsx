@@ -18,7 +18,7 @@ export default async function NewTransactionPage() {
             </div>
 
             <div className="p-1">
-                <UnifiedTransactionForm currentUserRole={session?.role} />
+                <UnifiedTransactionForm currentUserRole={session?.role} currentUserName={session?.nama_lengkap} />
             </div>
         </div>
     )

@@ -23,9 +23,9 @@ model Transaction {
   
   // Relations
   createdById String?  @db.Uuid
-  createdBy   User?    @relation("CreatedTransactions", fields: [createdById], references: [id])
+  createdBy   User?    @relation("CreatedTransactions", fields: [createdById], references: [id], onDelete: SetNull)
   updatedById String?  @db.Uuid
-  updatedBy   User?    @relation("UpdatedTransactions", fields: [updatedById], references: [id])
+  updatedBy   User?    @relation("UpdatedTransactions", fields: [updatedById], references: [id], onDelete: SetNull)
 }
 
 model User {
@@ -40,9 +40,23 @@ model User {
   // Relations
   createdTransactions Transaction[] @relation("CreatedTransactions")
   updatedTransactions Transaction[] @relation("UpdatedTransactions")
+  activities          ActivityLog[]
 
   @@index([role])
   @@map("users")
+}
+
+model ActivityLog {
+  id        Int      @id @default(autoincrement())
+  userId    String   @db.Uuid
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String   // e.g., "LOGIN", "LOGOUT", "CREATE_TRANSACTION", "UPDATE_TRANSACTION", "DELETE_TRANSACTION"
+  details   String   // The descriptive text requested by user
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([createdAt])
+  @@map("activity_logs")
 }
 
 enum TransactionType {

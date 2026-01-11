@@ -26,7 +26,11 @@ export default async function UsersPage() {
         username: u.username,
         nama_lengkap: u.nama_lengkap,
         role: u.role as 'ADMINISTRATOR' | 'PANITIA_ZIS'
-    }))
+    })).sort((a, b) => {
+        if (a.username === 'irmashid') return -1
+        if (b.username === 'irmashid') return 1
+        return 0 // Keep existing order from Prisma (created_at desc) for others
+    })
 
     return (
         <div className="max-w-7xl mx-auto space-y-6">

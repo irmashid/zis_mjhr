@@ -95,6 +95,21 @@ export async function deleteUser(id: string) {
     }
 
     try {
+        // Fetch current user data from database to check latest role
+        const userToDelete = await prisma.user.findUnique({
+            where: { id },
+            select: { role: true, username: true }
+        })
+
+        if (!userToDelete) {
+            return { success: false, message: 'User tidak ditemukan.' }
+        }
+
+        // Prevent deleting administrator accounts
+        if (userToDelete.role === 'ADMINISTRATOR') {
+            return { success: false, message: 'Tidak dapat menghapus akun Administrator.' }
+        }
+
         await prisma.user.delete({ where: { id } })
         revalidatePath('/users')
         return { success: true, message: 'User berhasil dihapus.' }

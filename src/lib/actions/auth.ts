@@ -3,8 +3,9 @@
 import { z } from 'zod'
 import { prisma } from '@/lib/prisma'
 import { compare } from 'bcryptjs'
-import { createSession, logout as destroySession } from '@/lib/auth/session'
+import { createSession, logout as destroySession, getSession } from '@/lib/auth/session'
 import { redirect } from 'next/navigation'
+import { logActivity } from './activity'
 
 const loginSchema = z.object({
     username: z.string().min(3),
@@ -53,6 +54,7 @@ export async function login(prevState: any, formData: FormData) {
         }
 
         await createSession(user.id, user.username, user.nama_lengkap, user.role)
+        await logActivity("LOGIN", `${user.role === 'ADMINISTRATOR' ? 'Administrator' : 'Panitia ZIS'} dengan nama lengkap ${user.nama_lengkap} baru saja login.`)
 
     } catch (error) {
         console.error('Login error:', error)
@@ -66,6 +68,10 @@ export async function login(prevState: any, formData: FormData) {
 }
 
 export async function logout() {
+    const session = await getSession()
+    if (session) {
+        await logActivity("LOGOUT", `${session.role === 'ADMINISTRATOR' ? 'Administrator' : 'Panitia ZIS'} dengan nama lengkap ${session.nama_lengkap} baru saja logout.`)
+    }
     await destroySession()
     redirect('/login')
 }

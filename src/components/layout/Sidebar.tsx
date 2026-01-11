@@ -4,7 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { usePathname, useRouter } from "next/navigation"
-import { LayoutDashboard, CreditCard, MapPin, Users } from "lucide-react"
+import { LayoutDashboard, CreditCard, MapPin, Users, History } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { AlertDialog } from "@/components/ui/AlertDialog"
 
@@ -12,6 +12,7 @@ const navigation = [
     { name: "Dashboard", href: "/", icon: LayoutDashboard },
     { name: "Transaksi Zakat", href: "/transaksi", icon: CreditCard },
     { name: "Manajemen User", href: "/users", icon: Users, roles: ['ADMINISTRATOR', 'PANITIA_ZIS'] },
+    { name: "Aktivitas", href: "/aktivitas", icon: History, roles: ['ADMINISTRATOR', 'PANITIA_ZIS'] },
 ]
 
 interface SidebarProps {

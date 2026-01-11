@@ -26,13 +26,14 @@ interface UnifiedTransactionFormProps {
     }
     originalId?: number // Added for single transaction edit fallback
     currentUserRole?: 'ADMINISTRATOR' | 'PANITIA_ZIS'
+    currentUserName?: string
 }
 
 /**
  * Komponen formulir utama untuk mencatat transaksi Zakat & Infaq.
  * Mendukung pencatatan batch (grup) dan satu-persatu.
  */
-export default function UnifiedTransactionForm({ initialData, originalId, currentUserRole }: UnifiedTransactionFormProps) {
+export default function UnifiedTransactionForm({ initialData, originalId, currentUserRole, currentUserName }: UnifiedTransactionFormProps) {
     const router = useRouter()
     const [step, setStep] = useState<"INPUT" | "SUCCESS">("INPUT")
     const [isUpdate, setIsUpdate] = useState(false)
@@ -201,7 +202,8 @@ export default function UnifiedTransactionForm({ initialData, originalId, curren
                     infaqAmount,
                     totalBayar,
                     paymentAmount,
-                    kembalian
+                    kembalian,
+                    officerName: currentUserName
                 })
                 setStep("SUCCESS")
             } else {
@@ -245,14 +247,12 @@ export default function UnifiedTransactionForm({ initialData, originalId, curren
                 </div>
 
                 {/* Area Cetak */}
-                <Card className="print-section border-2 border-dashed border-gray-300">
-                    <CardContent className="p-8 space-y-4 font-mono text-sm">
-                        <div className="text-center border-b pb-4 mb-4">
-                            <h3 className="font-bold text-lg">Panitia ZIS MJHR</h3>
+                <Card className="print-section border-0 border-gray-100 shadow-sm rounded-none">
+                    <CardContent className="p-8 pb-16 space-y-4 font-mono text-sm print:pb-24">
+                        <div className="text-center border-b-2 border-slate-900 pb-4 mb-4">
+                            <h3 className="font-bold text-lg">Panitia ZIS</h3>
                             <p>Masjid Jami&apos; Hidayaturrahmah</p>
                             <p>Jl. Bhakti ABRI No. 1 RT.001/RW.04</p>
-                            <p>Kel. Pegangsaan Dua Kec. Kelapa Gading</p>
-                            <p>Jakarta Utara - 14250</p>
                             <h4 className="font-bold text-xs text-gray-500">{receiptData.date}</h4>
                             <h4 className="font-bold text-xs text-gray-500">ID: {receiptData.id?.split('-')[0]}</h4>
                         </div>
@@ -266,14 +266,14 @@ export default function UnifiedTransactionForm({ initialData, originalId, curren
                             }</p>
                             <div className="flex justify-between">
                                 <span>Muzakki:</span>
-                                <span>{Array.from(new Set(receiptData.names as string[])).length} Jiwa</span>
+                                <span>{(receiptData.names as string[]).length} Jiwa</span>
                             </div>
                             <ul className="pl-4 list-disc text-xs text-gray-600">
-                                {Array.from(new Set(receiptData.names as string[])).map((n: string, i: number) => <li key={i}>{n}</li>)}
+                                {(receiptData.names as string[]).map((n: string, i: number) => <li key={i}>{n}</li>)}
                             </ul>
                         </div>
 
-                        <div className="border-t border-dashed my-4 pt-2 space-y-1">
+                        <div className="border-t-2 border-dashed border-slate-900 my-4 pt-2 space-y-1">
                             {receiptData.totalZakatBeras > 0 && (
                                 <div className="flex justify-between">
                                     <span>Zakat Beras</span>
@@ -290,7 +290,7 @@ export default function UnifiedTransactionForm({ initialData, originalId, curren
                                 <span>Infaq/Sedekah</span>
                                 <span>{new Intl.NumberFormat("id-ID").format(receiptData.infaqAmount)}</span>
                             </div>
-                            <div className="flex justify-between font-bold text-lg pt-2 border-t border-dashed">
+                            <div className="flex justify-between font-bold text-lg pt-2 border-t-2 border-slate-900">
                                 <span>Total</span>
                                 <span>{new Intl.NumberFormat("id-ID").format(receiptData.totalBayar)}</span>
                             </div>
@@ -307,9 +307,26 @@ export default function UnifiedTransactionForm({ initialData, originalId, curren
                             </div>
                         </div>
 
-                        <div className="text-center pt-6 space-y-1 border-t border-slate-50">
-                            <p className="text-[10px] font-bold text-slate-800">Terima kasih atas Zakat/Infaq Anda.</p>
-                            <p className="text-[10px] text-slate-400 italic">Semoga berkah dan diterima Allah SWT.</p>
+                        {/* Footer Section: Side-by-Side - Matching ReceiptModal */}
+                        <div className="pt-6 grid grid-cols-2 gap-4 items-start border-t-2 border-slate-900">
+                            <div className="text-left space-y-1">
+                                <p className="text-[10px] font-bold text-slate-800">Terima kasih atas Zakat/Infaq Anda.</p>
+                                <p className="text-[10px] text-slate-400 italic">Semoga berkah dan diterima Allah SWT.</p>
+                            </div>
+
+                            <div className="flex flex-col items-end print:pr-4">
+                                <div className="w-40 text-center space-y-10">
+                                    <div className="space-y-1">
+                                        <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Petugas ZIS</p>
+                                        <div className="h-0.5 w-full bg-slate-900 opacity-20" />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-xs font-bold text-slate-800 underline uppercase decoration-slate-900 decoration-2 underline-offset-4">
+                                            {receiptData.officerName || "...................."}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </CardContent>
                 </Card>

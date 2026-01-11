@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Pencil, Trash2, Plus, X, Loader2 } from "lucide-react"
+import { Pencil, Trash2, Plus, X, Loader2, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/Button"
 import { createUser, updateUser, deleteUser } from "@/lib/actions/users"
 import { useRouter } from "next/navigation"
@@ -35,6 +35,8 @@ export function UserList({ users, currentUserRole }: UserListProps) {
     const [isEditOpen, setIsEditOpen] = useState(false)
     const [selectedUser, setSelectedUser] = useState<User | null>(null)
     const [isLoading, setIsLoading] = useState(false)
+    const [currentPage, setCurrentPage] = useState(1)
+    const pageSize = 5
 
     // Popup state
     const [deleteId, setDeleteId] = useState<string | null>(null)
@@ -94,6 +96,13 @@ export function UserList({ users, currentUserRole }: UserListProps) {
         }
     }
 
+    const totalPages = Math.ceil(users.length / pageSize)
+    const paginatedUsers = users.slice((currentPage - 1) * pageSize, currentPage * pageSize)
+
+    if (currentPage > totalPages && totalPages > 0) {
+        setCurrentPage(totalPages)
+    }
+
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
@@ -122,7 +131,7 @@ export function UserList({ users, currentUserRole }: UserListProps) {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-100">
-                            {users.map((user) => (
+                            {paginatedUsers.map((user) => (
                                 <tr key={user.id} className="hover:bg-gray-50/30 transition-colors">
                                     <td className="px-6 py-4 text-sm font-bold text-gray-700">{user.username}</td>
                                     <td className="px-6 py-4 text-sm font-bold text-gray-700">{user.nama_lengkap}</td>
@@ -162,6 +171,40 @@ export function UserList({ users, currentUserRole }: UserListProps) {
                             ))}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Pagination Slide Footer */}
+                <div className="flex flex-col sm:flex-row items-center justify-end gap-4 py-4 px-8 bg-gray-50/30 border-t border-gray-100/50">
+                    <div className="flex items-center gap-4">
+                        <div className="text-[11px] font-black text-emerald-950 uppercase tracking-widest bg-emerald-50 px-4 py-1.5 rounded-full border border-emerald-100 shadow-sm">
+                            <span className="text-emerald-600">{currentPage}</span>
+                            <span className="mx-1 text-gray-300">/</span>
+                            <span className="text-emerald-600">{totalPages || 1}</span>
+                            <span className="ml-2 text-gray-400 font-bold lowercase tracking-normal">dari {users.length} data</span>
+                        </div>
+
+                        <div className="flex items-center gap-1.5 bg-white p-1 rounded-2xl shadow-sm border border-gray-100">
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                                disabled={currentPage === 1}
+                                className="size-8 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all disabled:opacity-20"
+                            >
+                                <ChevronLeft className="size-4" />
+                            </Button>
+
+                            <Button
+                                variant="ghost"
+                                size="icon"
+                                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                                disabled={currentPage >= totalPages}
+                                className="size-8 rounded-xl hover:bg-emerald-50 hover:text-emerald-600 transition-all disabled:opacity-20"
+                            >
+                                <ChevronRight className="size-4" />
+                            </Button>
+                        </div>
+                    </div>
                 </div>
             </div>
 

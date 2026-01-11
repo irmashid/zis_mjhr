@@ -16,6 +16,7 @@ export type ReceiptData = {
     totalBayar: number
     paymentAmount: number
     kembalian: number
+    officerName?: string
 }
 
 interface ReceiptModalProps {
@@ -60,13 +61,11 @@ export default function ReceiptModal({ isOpen, onClose, data }: ReceiptModalProp
                         <div className="p-6 overflow-y-auto flex-1 custom-scrollbar bg-slate-50/50 print:p-0 print:overflow-visible print:bg-white">
                             {/* Printable Area */}
                             <Card className="print-section border-0 shadow-sm rounded-2xl overflow-hidden bg-white ring-1 ring-slate-200/60 print:ring-0 print:shadow-none print:rounded-none">
-                                <CardContent className="p-8 space-y-6 font-mono text-sm text-slate-600 print:p-4">
-                                    <div className="text-center border-b border-slate-100 pb-6 mb-2 print:pb-4">
-                                        <h3 className="font-black text-xl text-emerald-600 tracking-tighter">Panitia ZIS MJHR</h3>
+                                <CardContent className="p-8 pb-16 space-y-6 font-mono text-sm text-slate-600 print:p-4 print:pb-24">
+                                    <div className="text-center border-b-2 border-slate-900 pb-6 mb-2 print:pb-4">
+                                        <h3 className="font-black text-xl text-emerald-600 tracking-tighter">Panitia ZIS</h3>
                                         <p className="font-bold text-slate-800">Masjid Jami' Hidayaturrahmah</p>
                                         <p>Jl. Bhakti ABRI No. 1 RT.001/RW.04</p>
-                                        <p>Kel. Pegangsaan Dua Kec. Kelapa Gading</p>
-                                        <p>Jakarta Utara - 14250</p>
                                         <p className="text-[10px] text-slate-400 mt-1 uppercase tracking-widest">{data.date}</p>
                                         <p className="text-[10px] font-bold text-emerald-500 bg-emerald-50 inline-block px-2 py-0.5 rounded-full mt-2 print:border print:border-emerald-200">
                                             ID: {data.id?.split('-')[0]}
@@ -83,12 +82,12 @@ export default function ReceiptModal({ isOpen, onClose, data }: ReceiptModalProp
                                                             data.type.replace("_", " ")}
                                             </span>
                                         </div>
-                                        <div className="flex justify-between items-center pt-2 border-t border-slate-50">
+                                        <div className="flex justify-between items-center pt-2 border-t-2 border-slate-900">
                                             <span className="text-slate-400">Muzakki:</span>
-                                            <span className="font-bold text-slate-800">{Array.from(new Set(data.names)).length} Jiwa</span>
+                                            <span className="font-bold text-slate-800">{(data.names as string[]).length} Jiwa</span>
                                         </div>
                                         <ul className="pl-4 space-y-1">
-                                            {Array.from(new Set(data.names)).map((n: string, i: number) => (
+                                            {(data.names as string[]).map((n: string, i: number) => (
                                                 <li key={i} className="text-xs list-disc marker:text-emerald-400">
                                                     {n}
                                                 </li>
@@ -96,7 +95,7 @@ export default function ReceiptModal({ isOpen, onClose, data }: ReceiptModalProp
                                         </ul>
                                     </div>
 
-                                    <div className="border-t border-dashed border-slate-200 my-4 pt-4 space-y-2">
+                                    <div className="border-t-2 border-dashed border-slate-900 my-4 pt-4 space-y-2">
                                         {data.totalZakatBeras > 0 && (
                                             <div className="flex justify-between items-center">
                                                 <span className="text-slate-400">Zakat Beras</span>
@@ -113,7 +112,7 @@ export default function ReceiptModal({ isOpen, onClose, data }: ReceiptModalProp
                                             <span className="text-slate-400">Infaq/Sedekah</span>
                                             <span className="font-bold text-slate-800">Rp {new Intl.NumberFormat("id-ID").format(data.infaqAmount)}</span>
                                         </div>
-                                        <div className="flex justify-between items-center pt-4 border-t border-slate-100">
+                                        <div className="flex justify-between items-center pt-4 border-t-2 border-slate-900">
                                             <span className="font-bold text-slate-800">Total</span>
                                             <span className="font-black text-lg text-emerald-600">
                                                 Rp {new Intl.NumberFormat("id-ID").format(data.totalBayar)}
@@ -136,9 +135,26 @@ export default function ReceiptModal({ isOpen, onClose, data }: ReceiptModalProp
                                         </div>
                                     </div>
 
-                                    <div className="text-center pt-6 space-y-1 border-t border-slate-50">
-                                        <p className="text-[10px] font-bold text-slate-800">Terima kasih atas Zakat/Infaq Anda.</p>
-                                        <p className="text-[10px] text-slate-400 italic">Semoga berkah dan diterima Allah SWT.</p>
+                                    {/* Footer Section: Side-by-Side */}
+                                    <div className="pt-6 grid grid-cols-2 gap-4 items-start border-t-2 border-slate-900">
+                                        <div className="text-left space-y-1">
+                                            <p className="text-[10px] font-bold text-slate-800">Terima kasih atas Zakat/Infaq Anda.</p>
+                                            <p className="text-[10px] text-slate-400 italic">Semoga berkah dan diterima Allah SWT.</p>
+                                        </div>
+
+                                        <div className="flex flex-col items-end print:pr-4">
+                                            <div className="w-40 text-center space-y-10">
+                                                <div className="space-y-1">
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Petugas ZIS</p>
+                                                    <div className="h-0.5 w-full bg-slate-900 opacity-20" />
+                                                </div>
+                                                <div className="space-y-1">
+                                                    <p className="text-xs font-bold text-slate-800 underline uppercase decoration-slate-900 decoration-2 underline-offset-4">
+                                                        {data.officerName || "...................."}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </CardContent>
                             </Card>

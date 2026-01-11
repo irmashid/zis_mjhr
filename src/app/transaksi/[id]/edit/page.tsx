@@ -73,7 +73,7 @@ export default async function EditTransactionPage({ params }: EditTransactionPag
             </div>
 
             <div className="p-1">
-                <UnifiedTransactionForm initialData={initialData} originalId={transaction.id} currentUserRole={session?.role} />
+                <UnifiedTransactionForm initialData={initialData} originalId={transaction.id} currentUserRole={session?.role} currentUserName={session?.nama_lengkap} />
             </div>
         </div>
     )

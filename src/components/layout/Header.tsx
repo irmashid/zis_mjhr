@@ -44,7 +44,7 @@ export function Header({ onToggleSidebar, session }: HeaderProps) {
                                 {session.role === 'ADMINISTRATOR' ? session.nama_lengkap : session.nama_lengkap}
                             </p>
                             <p className="text-[8px] font-bold text-emerald-600/60 uppercase tracking-widest">
-                                {session.role === 'ADMINISTRATOR' ? 'Active Session' : 'Panitia ZIS'}
+                                {session.role === 'ADMINISTRATOR' ? 'Administrator' : 'Panitia ZIS'}
                             </p>
                         </div>
                         <div className="relative">
